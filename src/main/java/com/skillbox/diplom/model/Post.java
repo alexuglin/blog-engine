@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 public class Post {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column(name = "is_active", nullable = false)
@@ -21,12 +22,14 @@ public class Post {
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "moderation_status", columnDefinition = "enum", nullable = false)
 	private ModerationStatus moderationStatus;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "moderator_id")
+	private User moderator;
 	
-	@Column(name = "moderator_id")
-	private Integer moderatorId;
-	
-	@Column(name = "user_id", nullable = false)
-	private int userId;
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 	
 	@Column(name = "time", nullable = false)
 	private LocalDateTime time;
@@ -39,4 +42,19 @@ public class Post {
 	
 	@Column(name = "view_count", nullable = false)
 	private int viewCount;
+
+	@OneToMany(mappedBy = "post", cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	private List<PostVote> postVoteList;
+
+	@OneToMany(mappedBy = "post", cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	private List<PostComment> postComments;
+
+	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	@JoinTable(name = "tag2post",
+		joinColumns = {@JoinColumn (name = "post_id")},
+	inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+	private List<Tag> tagList;
 }

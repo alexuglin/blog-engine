@@ -10,12 +10,16 @@ import javax.persistence.*;
 public class Tag2Post {
 		
 	@Id
-	@GeneratedValue (strategy = GenerationType.AUTO)
+	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	private int id;
-	
-	@Column(name = "post_id", nullable = false)
-	private int postId;
-	
-	@Column(name = "tag_id", nullable = false)
-	private int tagId;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	@JoinColumn(name = "post_id", nullable = false)
+	private Post post;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	@JoinColumn(name = "tag_id", nullable = false)
+	private Tag tag;
 }

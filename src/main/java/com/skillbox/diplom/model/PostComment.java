@@ -11,17 +11,21 @@ import java.time.LocalDateTime;
 public class PostComment {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column(name = "parent_id")
 	private Integer parentId;
-	
-	@Column(name = "post_id", nullable = false)
-	private int postId;
-	
-	@Column(name = "user_id", nullable = false)
-	private int userId;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	@JoinColumn(name = "post_id", nullable = false)
+	private Post post;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 	
 	@Column(name = "time", nullable = false)
 	private LocalDateTime time;

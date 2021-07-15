@@ -11,14 +11,16 @@ import java.time.LocalDateTime;
 public class PostVote {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
-	@Column(name = "user_id", nullable = false)
+
+	@Column(name = "user_id")
 	private int userId;
 	
-	@Column(name = "post_id", nullable = false)
-	private int postId;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
+			CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
+	@JoinColumn(name = "post_id")
+	private Post post;
 	
 	@Column(name = "time", nullable = false)
 	private LocalDateTime time;

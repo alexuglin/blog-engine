@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class GlobalSetting {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column(name = "code", nullable = false)
