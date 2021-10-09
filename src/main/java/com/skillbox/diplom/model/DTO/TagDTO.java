@@ -7,19 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDTO {
-
-    private Integer id;
+public class TagDTO {
 
     private String name;
 
-    private String photo;
+    private double weight;
 
-    private String email;
-
-    private boolean moderation;
-
-    private int moderationCount;
-
-    private boolean settings = true;
 }

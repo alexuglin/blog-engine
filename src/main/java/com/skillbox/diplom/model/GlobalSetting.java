@@ -1,6 +1,7 @@
 package com.skillbox.diplom.model;
 
 import com.skillbox.diplom.model.enums.NameSetting;
+import com.skillbox.diplom.model.enums.ValueSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,5 +36,6 @@ public class GlobalSetting {
     private String name;
 
     @Column(name = "value", nullable = false)
-    private String value;
+    @Enumerated(value = EnumType.STRING)
+    private ValueSetting value;
 }
