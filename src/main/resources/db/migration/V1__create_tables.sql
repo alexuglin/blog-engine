@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users
     (id INT NOT NULL AUTO_INCREMENT,
-    is_moderator TINYINT NOT NULL,
+
+    is_moderator TINYINT(1) NOT NULL,
     reg_time DATETIME NOT NULL,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -11,12 +12,13 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS posts
     (id INT NOT NULL AUTO_INCREMENT,
-    is_active TINYINT NOT NULL,
+    is_active TINYINT(1) NOT NULL,
     moderation_status enum ('NEW', 'ACCEPTED', 'DECLINED') NOT NULL DEFAULT 'NEW',
     moderator_id INT,
     user_id INT NOT NULL,
     time DATETIME NOT NULL,
     title VARCHAR(255) NOT NULL,
+    text TEXT NOT NULL,
     view_count INT  NOT NULL,
     PRIMARY KEY (id));
 
