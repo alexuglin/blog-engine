@@ -23,5 +23,4 @@ public class ApiAuthController {
     public ResponseEntity<AuthResponse> checkAuth() {
         return authService.checkAuth();
     }
-
 }

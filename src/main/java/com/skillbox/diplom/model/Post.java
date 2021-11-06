@@ -1,6 +1,7 @@
 package com.skillbox.diplom.model;
 
 import com.skillbox.diplom.model.enums.ModerationStatus;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

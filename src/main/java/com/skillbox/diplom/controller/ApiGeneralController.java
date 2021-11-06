@@ -40,5 +40,4 @@ public class ApiGeneralController {
     public ResponseEntity<Map<String, List<TagDTO>>> getTags(@RequestParam(required = false) String query) {
         return generalService.getTags(query);
     }
-
 }

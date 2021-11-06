@@ -56,5 +56,4 @@ public class PostComment {
     @ToString.Exclude
     @OneToMany(mappedBy = "parentComment")
     private List<PostComment> comments;
-
 }
