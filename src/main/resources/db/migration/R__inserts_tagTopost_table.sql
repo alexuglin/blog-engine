@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.tag2post;
+FROM tag2post;
 
 INSERT INTO blog_engine.tag2post (id, post_id, tag_id)
 VALUES (10001, 10001, 10001),

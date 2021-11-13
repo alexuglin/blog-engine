@@ -29,8 +29,8 @@ public class CaptchaCode {
     private LocalDateTime time;
 
     @Column(name = "code", nullable = false)
-    private byte code;
+    private String code;
 
     @Column(name = "secret_code", nullable = false)
-    private byte secretCode;
+    private String secretCode;
 }

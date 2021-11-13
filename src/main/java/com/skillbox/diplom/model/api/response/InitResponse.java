@@ -12,7 +12,7 @@ public class InitResponse {
     private String title = "DevPub";
 
     @JsonProperty(value = "subtitle")
-    private String subtitle  = "Рассказы разработчиков";
+    private String subtitle = "Рассказы разработчиков";
 
     @JsonProperty(value = "phone")
     private String phone = "+7-900-539 95 79";

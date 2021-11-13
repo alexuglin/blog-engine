@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.tags;
+FROM tags;
 
 INSERT INTO blog_engine.tags(id, name)
 VALUES (10001, 'пустился'),

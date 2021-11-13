@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.users;
+FROM users;
 
 insert into blog_engine.users (id, is_moderator, reg_time, name, email, password, code, photo)
 values (10001, 0, '2021-10-01 10:00:00', 'Семен Листов', 'semenListov@Collection.com',

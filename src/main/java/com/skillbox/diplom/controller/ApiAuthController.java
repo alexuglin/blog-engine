@@ -1,5 +1,6 @@
 package com.skillbox.diplom.controller;
 
+import com.skillbox.diplom.model.DTO.CaptchaDTO;
 import com.skillbox.diplom.model.api.response.AuthResponse;
 import com.skillbox.diplom.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,5 +23,10 @@ public class ApiAuthController {
     @GetMapping("/check")
     public ResponseEntity<AuthResponse> checkAuth() {
         return authService.checkAuth();
+    }
+
+    @GetMapping("/captcha")
+    public ResponseEntity<CaptchaDTO> getCaptcha() {
+        return authService.getCaptcha();
     }
 }

@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS post_comments
 CREATE TABLE IF NOT EXISTS captcha_codes
     (id INT NOT NULL AUTO_INCREMENT,
     time DATETIME NOT NULL,
-    code TINYINT NOT NULL,
-    secret_code TINYINT NOT NULL,
+    code TINYTEXT NOT NULL,
+    secret_code TINYTEXT NOT NULL,
     PRIMARY KEY (id));
 
 CREATE TABLE IF NOT EXISTS global_settings

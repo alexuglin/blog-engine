@@ -1,12 +1,17 @@
 package com.skillbox.diplom.controller;
 
-import com.skillbox.diplom.model.api.response.PostResponse;
+import com.skillbox.diplom.model.DTO.PostDTO;
+import com.skillbox.diplom.model.api.request.PostRequest;
+import com.skillbox.diplom.model.api.request.RequestByDate;
+import com.skillbox.diplom.model.api.request.SearchRequest;
+import com.skillbox.diplom.model.api.request.TagRequest;
+import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,9 +26,27 @@ public class ApiPostController {
     }
 
     @GetMapping
-    public ResponseEntity<PostResponse> getPosts(@RequestParam(required = false) int offset,
-                                                 @RequestParam(required = false) int limit,
-                                                 @RequestParam(required = false) String mode) {
-        return postService.getPost(offset, limit, mode);
+    public ResponseEntity<PostsResponse> getPosts(PostRequest postRequest) {
+        return postService.getPost(postRequest);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<PostsResponse> searchPosts(SearchRequest searchRequest) {
+        return postService.searchPosts(searchRequest);
+    }
+
+    @GetMapping("/byDate")
+    public ResponseEntity<PostsResponse> getPostsByDate(RequestByDate requestByDate) {
+        return postService.getPostsByDate(requestByDate);
+    }
+
+    @GetMapping("/byTag")
+    public ResponseEntity<PostsResponse> getPostsByTag(TagRequest tagRequest) {
+        return postService.getPostsByTag(tagRequest);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Integer id) {
+        return postService.getPostById(id);
     }
 }

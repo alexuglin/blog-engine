@@ -1,6 +1,7 @@
 package com.skillbox.diplom.controller;
 
 import com.skillbox.diplom.model.DTO.TagDTO;
+import com.skillbox.diplom.model.api.response.CalendarResponse;
 import com.skillbox.diplom.model.api.response.InitResponse;
 import com.skillbox.diplom.model.enums.NameSetting;
 import com.skillbox.diplom.service.GeneralService;
@@ -39,5 +40,10 @@ public class ApiGeneralController {
     @GetMapping("/tag")
     public ResponseEntity<Map<String, List<TagDTO>>> getTags(@RequestParam(required = false) String query) {
         return generalService.getTags(query);
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<CalendarResponse> getCountPostsInDay(Integer year) {
+        return generalService.getCountPostsInDay(year);
     }
 }
