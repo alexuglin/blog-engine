@@ -8,7 +8,10 @@ public enum FieldName {
     NAME("name"),
     TAG("tag"),
     POST("post"),
-    ;
+    EMAIL("email"),
+    PASSWORD("password"),
+    CAPTCHA("captcha"),
+    IMAGE("image");
 
     private final String description;
 

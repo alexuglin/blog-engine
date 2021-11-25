@@ -17,9 +17,11 @@ public class UserDTO {
 
     private String email;
 
-    private boolean moderation;
+    private String password;
 
-    private int moderationCount;
+    private Boolean moderation;
+
+    private Integer moderationCount;
 
     private boolean settings = true;
 }

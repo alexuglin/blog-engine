@@ -1,6 +1,7 @@
 package com.skillbox.diplom.service;
 
 import com.skillbox.diplom.exceptions.NotFoundPostException;
+import com.skillbox.diplom.exceptions.enums.Errors;
 import com.skillbox.diplom.model.DTO.PostDTO;
 import com.skillbox.diplom.model.Post;
 import com.skillbox.diplom.model.api.request.PostRequest;
@@ -98,7 +99,7 @@ public class PostService {
             опубликован и false если скрыт (при этом модераторы и автор поста будет его видеть)  */
         if (!post.isActive() || post.getModerationStatus() != ModerationStatus.ACCEPTED
                 || post.getTime().compareTo(LocalDateTime.now()) > 0) {
-            throw new NotFoundPostException("Post not found");
+            throw new NotFoundPostException(Errors.DOCUMENT_NOT_FOUND.getMessage());
         }
         post.setViewCount(post.getViewCount() + 1);
         postRepository.save(post);

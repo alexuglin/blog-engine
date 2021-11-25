@@ -13,4 +13,6 @@ public interface CaptchaCodeRepository extends JpaRepository<CaptchaCode, Intege
             " WHERE DATE_ADD(captcha.time, INTERVAL :timePeriod SECOND ) <= CURRENT_TIMESTAMP()"
             , nativeQuery = true)
     void deleteCaptchaCodeBy(@Param("timePeriod") Integer timePeriod);
+
+    CaptchaCode findBySecretCode(String secretCode);
 }
