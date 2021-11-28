@@ -1,17 +1,19 @@
 package com.skillbox.diplom.model.mappers.convert;
 
+import lombok.NoArgsConstructor;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
+@NoArgsConstructor
 public class TextConverter {
 
     private static final String SPACE = " ";
     private static final int MAX_LEN_ANNOUNCE = 150;
-    private static final  String CHOOSE_TAGS = "<.+?>";
-    private static final  String ELLIPSIS = "...";
+    private static final String CHOOSE_TAGS = "<.+?>";
+    private static final String ELLIPSIS = "...";
 
     @Named("textToAnnounce")
     public String textToAnnounce(String text) {

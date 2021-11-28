@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.posts;
+FROM posts;
 
 INSERT INTO blog_engine.posts (id, is_active, moderation_status, moderator_id, user_id, time, title, text, view_count)
 VALUES (10001, true, 'ACCEPTED', null, 10001, '2021-09-20 20:34:50', 'Однажды маленькая над дороге скатился!',

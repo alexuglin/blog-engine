@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.post_votes;
+FROM post_votes;
 
 INSERT INTO blog_engine.post_votes (id, user_id, post_id, time, value)
 VALUES (1003, 10003, 10001, '2021-09-21 00:34:50', 1),

@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.users;
+FROM users;
 
 insert into blog_engine.users (id, is_moderator, reg_time, name, email, password, code, photo)
 values (10001, 0, '2021-10-01 10:00:00', 'Семен Листов', 'semenListov@Collection.com',
@@ -17,6 +17,6 @@ values (10001, 0, '2021-10-01 10:00:00', 'Семен Листов', 'semenListov
        (10005, 0, '2021-10-05 17:47:05', 'Юстас Стримин', 'UriStream@stream.com',
         '$2y$12$n/Xo793w01lr/FGPxzZr5.RBis64hqDVZIhZtVx.iEHFP7cegGC7e', null,
         'https://cdn.pixabay.com/photo/2013/09/19/07/06/fountain-183702_960_720.jpg'),
-       (10006, 1, '2021-10-05 17:47:05', 'Jordan Exception', 'jotdonExcept@Jo.com',
+       (10006, 1, '2021-10-05 17:47:05', 'Jordan Exception', 'jordonExcept@Jo.com',
         '$2y$12$n/Xo793w01lr/FGPxzZr5.RBis64hqDVZIhZtVx.iEHFP7cegGC7e', null,
         null);

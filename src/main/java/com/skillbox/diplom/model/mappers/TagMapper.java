@@ -7,8 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(imports = Calculator.class)
-public interface TagMapper {
+public abstract class TagMapper {
 
     @Mapping(target = "weight", expression = "java(dWeightMax * Calculator.weightTag(countActivePosts, tag.getPostList().size()))")
-    TagDTO convert(Tag tag, long countActivePosts, double dWeightMax);
+    public abstract TagDTO convertTo(Tag tag, long countActivePosts, double dWeightMax);
+
+    public String tagToString(Tag tag) {
+        return tag.getName();
+    }
 }

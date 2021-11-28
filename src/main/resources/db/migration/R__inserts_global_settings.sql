@@ -1,5 +1,5 @@
 DELETE
-FROM blog_engine.global_settings;
+FROM global_settings;
 
 INSERT INTO blog_engine.global_settings (code, name, value)
 VALUES ('MULTIUSER_MODE', 'Многопользовательский режим', 'YES'),

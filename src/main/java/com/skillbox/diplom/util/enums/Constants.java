@@ -2,8 +2,7 @@ package com.skillbox.diplom.util.enums;
 
 public enum Constants {
 
-    PERCENT ("%"),
-    TAGS ("tags");
+    TAGS("tags");
 
     private final String value;
 

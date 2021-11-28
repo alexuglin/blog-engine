@@ -5,9 +5,9 @@ import org.mapstruct.Named;
 
 import java.util.List;
 
-public class Counter {
+public class CounterVotes {
 
-    public static int calculateVote(List<PostVote> postVotes, int voteValue) {
+    private int calculateVote(List<PostVote> postVotes, int voteValue) {
         return (int) postVotes.stream()
                 .filter(postVote -> postVote.getValue() == voteValue).count();
     }
@@ -15,5 +15,15 @@ public class Counter {
     @Named("calculateCountElementsList")
     public int calculateCountElementsList(List<?> list) {
         return list.size();
+    }
+
+    @Named("calculateCountLikes")
+    public int calculateCountLikes(List<PostVote> postVotes) {
+        return calculateVote(postVotes, 1);
+    }
+
+    @Named("calculateCountDislikes")
+    public int calculateCountDislikes(List<PostVote> postVotes) {
+        return calculateVote(postVotes, -1);
     }
 }

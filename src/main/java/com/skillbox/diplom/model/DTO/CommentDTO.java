@@ -4,24 +4,20 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDTO {
+public class CommentDTO {
 
     private Integer id;
 
-    private String name;
+    private Long timestamp;
 
-    private String photo;
+    private String text;
 
-    private String email;
+    private UserDTO user;
 
-    private String password;
-
-    private Boolean moderation;
-
-    private Integer moderationCount;
-
-    private boolean settings = true;
+    private List<CommentDTO> comments;
 }
