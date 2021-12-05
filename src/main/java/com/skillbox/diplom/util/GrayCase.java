@@ -10,7 +10,7 @@ import java.awt.*;
 public class GrayCase extends Cage {
     private static final int HEIGHT = 35;
     private static final int WIDTH = 100;
-    private static final int TOKEN_LEN_MIN = 5;
+    private static final int TOKEN_LEN_MIN = 4;
     private static final int TOKEN_LEN_DELTA = 2;
 
     public GrayCase() {

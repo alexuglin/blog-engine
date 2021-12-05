@@ -5,6 +5,7 @@ import com.skillbox.diplom.model.DTO.TagDTO;
 import com.skillbox.diplom.model.TagToPost;
 import com.skillbox.diplom.model.api.response.CalendarResponse;
 import com.skillbox.diplom.model.api.response.InitResponse;
+import com.skillbox.diplom.model.enums.ModerationStatus;
 import com.skillbox.diplom.model.enums.NameSetting;
 import com.skillbox.diplom.model.enums.ValueSetting;
 import com.skillbox.diplom.model.mappers.TagMapper;
@@ -12,13 +13,14 @@ import com.skillbox.diplom.model.mappers.calculate.Calculator;
 import com.skillbox.diplom.repository.GlobalSettingsRepository;
 import com.skillbox.diplom.repository.PostRepository;
 import com.skillbox.diplom.repository.TagToPostRepository;
-import com.skillbox.diplom.util.enums.Constants;
+import com.skillbox.diplom.util.enums.FieldName;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -51,18 +53,26 @@ public class GeneralService {
     }
 
     public ResponseEntity<Map<String, List<TagDTO>>> getTags(String query) {
-        long countPost = postRepository.countAllActivePosts();
+        long countAllPosts = postRepository.countAllActivePosts();
         List<TagToPost> tagToPostList = tagToPostRepository.findTagToPostByActive(Objects.isNull(query) ? "" : query);
-        int maxCountPosts = tagToPostRepository.getCountPostsFromTags();
-        double weightMax = 1 / Calculator.weightTag(countPost, maxCountPosts);
+        int maxCountPostsFromTags = tagToPostRepository.getCountPostsFromTags();
+        double weightMax = 1 / Calculator.weightTag(countAllPosts, maxCountPostsFromTags);
         List<TagDTO> tagDTOList = tagToPostList
                 .stream()
                 .map(TagToPost::getTag)
                 .distinct()
-                .map(tag -> tagMapper.convertTo(tag, countPost, weightMax))
-                .collect(Collectors.toList());
+                .map(tag -> {
+                    long countPostsCurrentTag = tag
+                            .getPostList()
+                            .stream()
+                            .filter(post -> post.isActive()
+                                    && post.getModerationStatus() == ModerationStatus.ACCEPTED
+                                    && post.getTime().compareTo(LocalDateTime.now()) < 1).count();
+                    double weight = weightMax * Calculator.weightTag(countAllPosts, countPostsCurrentTag);
+                    return tagMapper.convertTo(tag, weight);
+                }).collect(Collectors.toList());
         Map<String, List<TagDTO>> tags = new HashMap<>();
-        tags.put(Constants.TAGS.getValue(), tagDTOList);
+        tags.put(FieldName.TAGS.getDescription(), tagDTOList);
         return ResponseEntity.ok(tags);
     }
 
