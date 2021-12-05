@@ -27,8 +27,8 @@ public interface TagToPostRepository extends JpaRepository<TagToPost, Integer> {
             "(SELECT post " +
             "   FROM Post post " +
             "   WHERE post.isActive = true " +
-            "       and post.moderationStatus = 'ACCEPTED' " +
-            "       and post.time <= current_timestamp)" +
-            "and tp.tag.name like :nameTag%")
+            "       AND post.moderationStatus = 'ACCEPTED' " +
+            "       AND post.time <= CURRENT_TIMESTAMP )" +
+            "AND tp.tag.name LIKE :nameTag%")
     List<TagToPost> findTagToPostByActive(@Param("nameTag") String nameTag);
 }

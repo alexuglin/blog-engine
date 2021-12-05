@@ -1,7 +1,7 @@
 DELETE
 FROM users;
 
-insert into blog_engine.users (id, is_moderator, reg_time, name, email, password, code, photo)
+insert into users (id, is_moderator, reg_time, name, email, password, code, photo)
 values (10001, 0, '2021-10-01 10:00:00', 'Семен Листов', 'semenListov@Collection.com',
         '$2y$12$n/Xo793w01lr/FGPxzZr5.RBis64hqDVZIhZtVx.iEHFP7cegGC7e', null,
         'https://techrocks.ru/wp-content/uploads/2018/08/gargoyle-780540_1280-e1535726396204.jpg'),

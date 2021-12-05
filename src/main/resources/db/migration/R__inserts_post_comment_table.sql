@@ -1,7 +1,7 @@
 DELETE
 FROM post_comments;
 
-INSERT INTO blog_engine.post_comments(id, parent_id, post_id, user_id, time, text)
+INSERT INTO post_comments(id, parent_id, post_id, user_id, time, text)
 VALUES (10001, null, 10050, 10001, '2021-11-22 15:50:25',
         'Ему продолжил она оксмокс первую вскоре, маленькая буквенных необходимыми даже.'),
        (10002, null, 10008, 10006, '2021-11-13 12:56:56',

@@ -14,6 +14,6 @@ public interface UserMapper {
     UserDTO convertTo(User user);
 
     @Mapping(target = "regTime", expression = "java(LocalDateTime.now())")
-   @Mapping(target = "moderator", expression = "java(false)")
+    @Mapping(target = "moderator", expression = "java(false)")
     User userRequestToUser(UserRequest userRequest);
 }
