@@ -2,6 +2,7 @@ package com.skillbox.diplom.repository;
 
 import com.skillbox.diplom.model.DTO.CountPostsDay;
 import com.skillbox.diplom.model.Post;
+import com.skillbox.diplom.model.enums.ModerationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -91,4 +92,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "WHERE post.isActive = false" +
             " AND post.time <= CURRENT_TIMESTAMP")
     long countNoActivePosts();
+
+    int countPostByModerationStatus(ModerationStatus moderationStatus);
 }
