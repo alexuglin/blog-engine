@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 
 @RestController
@@ -34,8 +32,8 @@ public class ApiAuthController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<AuthResponse> logout(HttpServletRequest request, HttpServletResponse response) {
-        return authService.logout(request, response);
+    public ResponseEntity<AuthResponse> logout() {
+        return authService.logout();
     }
 
     @GetMapping("/check")

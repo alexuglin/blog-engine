@@ -5,6 +5,7 @@ import com.skillbox.diplom.exceptions.WrongDataException;
 import com.skillbox.diplom.model.api.response.ErrorResponse;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,5 +29,14 @@ public class AdviceController {
     public ErrorResponse handleWrongDateRequestException(WrongDataException exception) {
         logger.warn(exception);
         return exception.getErrorResponse();
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ErrorResponse handleAuthenticationException(AuthenticationException exception) {
+        logger.warn(exception);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setResult(false);
+        return errorResponse;
     }
 }

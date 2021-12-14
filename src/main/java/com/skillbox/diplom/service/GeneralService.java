@@ -53,7 +53,8 @@ public class GeneralService {
     }
 
     public ResponseEntity<Map<String, List<TagDTO>>> getTags(String query) {
-        long countAllPosts = postRepository.countAllActivePosts();
+        long countAllPosts = postRepository
+                .countPostByModerationStatusAndIsActiveAndTimeLessThanEqual(ModerationStatus.ACCEPTED,true,LocalDateTime.now());
         List<TagToPost> tagToPostList = tagToPostRepository.findTagToPostByActive(Objects.isNull(query) ? "" : query);
         int maxCountPostsFromTags = tagToPostRepository.getCountPostsFromTags();
         double weightMax = 1 / Calculator.weightTag(countAllPosts, maxCountPostsFromTags);

@@ -22,19 +22,6 @@ public class Scheduler {
     private final Logger logger = Logger.getLogger(Scheduler.class);
 
     /**
-     * Активация отложенных постов каждую минуту
-     */
-    @Scheduled(fixedRate = 60000)
-    @Transactional
-    public void activationOfPosts() {
-        long countRecord = postRepository.countNoActivePosts();
-        if (countRecord > 0) {
-            postRepository.activationOfPosts();
-            logger.info("Activate posts: " + countRecord);
-        }
-    }
-
-    /**
      * Удаление каждую секунду просроченных капчей
      */
     @Scheduled(fixedRate = 1000)

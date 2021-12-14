@@ -25,18 +25,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -66,19 +61,20 @@ public class AuthService {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword()));
         User user = (User) authentication.getPrincipal();
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         return ResponseEntity.ok(getAuthResponse(user.getUsername()));
     }
 
-    public ResponseEntity<AuthResponse> logout(HttpServletRequest request, HttpServletResponse response) {
-        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        return ResponseEntity.ok(responseMapper.convertTo(null,true));
+    public ResponseEntity<AuthResponse> logout() {
+        SecurityContextHolder.clearContext();
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setResult(true);
+        return ResponseEntity.ok(authResponse);
     }
 
     public ResponseEntity<AuthResponse> checkAuth(Principal principal) {
-        if (Objects.isNull(principal)) {
-            return ResponseEntity.ok(new AuthResponse());
-        }
-        return ResponseEntity.ok(getAuthResponse(principal.getName()));
+        AuthResponse authResponse = Objects.isNull(principal) ? new AuthResponse() : getAuthResponse(principal.getName());
+        return ResponseEntity.ok(authResponse);
     }
 
     @Transactional
