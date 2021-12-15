@@ -1,5 +1,6 @@
 package com.skillbox.diplom.model;
 
+import com.skillbox.diplom.model.enums.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,4 +56,8 @@ public class User {
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 
     private List<Post> postList;
+
+    public Role getRole() {
+        return isModerator ? Role.MODERATOR : Role.USER;
+    }
 }

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
@@ -24,9 +26,19 @@ public class ApiAuthController {
         this.authService = authService;
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody UserRequest userRequest) {
+        return authService.login(userRequest);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<AuthResponse> logout() {
+        return authService.logout();
+    }
+
     @GetMapping("/check")
-    public ResponseEntity<AuthResponse> checkAuth() {
-        return authService.checkAuth();
+    public ResponseEntity<AuthResponse> checkAuth(Principal principal) {
+        return authService.checkAuth(principal);
     }
 
     @GetMapping("/captcha")

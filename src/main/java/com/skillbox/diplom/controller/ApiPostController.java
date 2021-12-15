@@ -2,6 +2,7 @@ package com.skillbox.diplom.controller;
 
 import com.skillbox.diplom.model.DTO.PostDTO;
 import com.skillbox.diplom.model.api.request.PostRequest;
+import com.skillbox.diplom.model.api.request.PostsRequest;
 import com.skillbox.diplom.model.api.request.RequestByDate;
 import com.skillbox.diplom.model.api.request.SearchRequest;
 import com.skillbox.diplom.model.api.request.TagRequest;
@@ -48,5 +49,10 @@ public class ApiPostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable Integer id) {
         return postService.getPostById(id);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<PostsResponse> getMyPosts(PostsRequest postsRequest) {
+        return postService.getMyPosts(postsRequest);
     }
 }

@@ -23,5 +23,5 @@ public class UserDTO {
 
     private Integer moderationCount;
 
-    private boolean settings = true;
+    private Boolean settings;
 }

@@ -11,7 +11,8 @@ public enum FieldName {
     EMAIL("email"),
     PASSWORD("password"),
     CAPTCHA("captcha"),
-    IMAGE("image");
+    IMAGE("image"),
+    TAGS("tags");
 
     private final String description;
 
