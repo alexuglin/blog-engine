@@ -109,27 +109,28 @@ public class PostService {
     }
 
     public ResponseEntity<PostsResponse> getMyPosts(PostsRequest postsRequest) {
-        logger.info(postsRequest);
+        logger.info("getMyPosts" + postsRequest);
         String email = UserUtility.getCurrentUserEmail();
-        Page<Post> postPage;
         Pageable pageable = Paging.getPaging(postsRequest.getOffset(), postsRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending());
-        switch (postsRequest.getStatus()) {
-            case "inactive":
-                postPage = postRepository.findAllByPostNotActiveByUserEmail(email, pageable);
-                break;
-            case "pending":
-                postPage = postRepository.findAllByPostByUserEmail(email, ModerationStatus.NEW, pageable);
-                break;
-            case "declined":
-                postPage = postRepository.findAllByPostByUserEmail(email, ModerationStatus.DECLINED, pageable);
-                break;
-            default:
-                postPage = postRepository.findAllByPostByUserEmail(email, ModerationStatus.ACCEPTED, pageable);
-        }
+        String status = postsRequest.getStatus();
+        Page<Post> postPage = status.equals("inactive") ? postRepository.findAllByPostNotActiveByUserEmail(email, pageable) :
+                postRepository.findAllByPostByUserEmail(email, ModerationStatus.findModerationStatusByStatus(status), pageable);
         return ResponseEntity.ok(getPostsResponse(postPage));
     }
 
-    private PostsResponse getPostsResponse( Page<Post> postPage) {
+    public ResponseEntity<PostsResponse> getPostModeration(PostsRequest postsRequest) {
+        logger.info("getPostModeration" + postsRequest);
+        String email = UserUtility.getCurrentUserEmail();
+        Pageable pageable = Paging.getPaging(postsRequest.getOffset(), postsRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending());
+        String status = postsRequest.getStatus();
+        ModerationStatus moderationStatus = ModerationStatus.findModerationStatusByStatus(status);
+        Page<Post> postPage = moderationStatus == ModerationStatus.NEW ?
+                postRepository.findAllByPostByModerationStatus(moderationStatus, pageable) :
+                postRepository.findAllByPostByModeratorEmail(email, moderationStatus, pageable);
+        return ResponseEntity.ok(getPostsResponse(postPage));
+    }
+
+    private PostsResponse getPostsResponse(Page<Post> postPage) {
         List<PostDTO> postDTOList = postMapper.pagePostToListPostDTO(postPage);
         return new PostsResponse(postPage.getTotalElements(), postDTOList);
     }

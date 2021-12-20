@@ -70,7 +70,7 @@ public class GeneralService {
                                     && post.getModerationStatus() == ModerationStatus.ACCEPTED
                                     && post.getTime().compareTo(LocalDateTime.now()) < 1).count();
                     double weight = weightMax * Calculator.weightTag(countAllPosts, countPostsCurrentTag);
-                    return tagMapper.convertTo(tag, weight);
+                    return tagMapper.tagToTagDTO(tag, weight);
                 }).collect(Collectors.toList());
         Map<String, List<TagDTO>> tags = new HashMap<>();
         tags.put(FieldName.TAGS.getDescription(), tagDTOList);

@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 public abstract class TagMapper {
 
     @Mapping(target = "weight", source = "weight")
-    public abstract TagDTO convertTo(Tag tag, double weight);
+    public abstract TagDTO tagToTagDTO(Tag tag, double weight);
 
     public String tagToString(Tag tag) {
         return tag.getName();

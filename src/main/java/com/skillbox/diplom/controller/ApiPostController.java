@@ -10,6 +10,7 @@ import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +53,15 @@ public class ApiPostController {
     }
 
     @GetMapping("/my")
+    @PreAuthorize("hasAnyAuthority('user:write')")
     public ResponseEntity<PostsResponse> getMyPosts(PostsRequest postsRequest) {
         return postService.getMyPosts(postsRequest);
     }
+
+    @GetMapping("/moderation")
+    @PreAuthorize("hasAnyAuthority('user:moderate')")
+    public ResponseEntity<PostsResponse> getPostModeration(PostsRequest postsRequest) {
+        return postService.getPostModeration(postsRequest);
+    }
+
 }

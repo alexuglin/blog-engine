@@ -75,21 +75,31 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "   AND tp.tag.name = :tag ")
     Page<Post> findPostByTag(@Param("tag") String tag, Pageable paging);
 
-    int countPostByModerationStatus(ModerationStatus moderationStatus);
+    int countPostByModerationStatusAndIsActive(ModerationStatus moderationStatus, boolean active);
 
     @Query(value = "SELECT post " +
-            "FROM Post post INNER JOIN User user " +
-            "ON post.user = user " +
+            "FROM Post post " +
             "WHERE post.isActive = true" +
             "   AND post.moderationStatus = :moderationStatus" +
-            "   AND user.email = :email ")
+            "   AND post.user.email = :email ")
     Page<Post> findAllByPostByUserEmail(@Param("email") String email, @Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
 
     @Query(value = "SELECT post " +
-            "FROM Post post INNER JOIN User user " +
-            "ON post.user = user " +
+            "FROM Post post " +
             "WHERE post.isActive = false" +
-            "   AND user.email = :email ")
+            "   AND post.user.email = :email ")
     Page<Post> findAllByPostNotActiveByUserEmail(@Param("email") String email, Pageable pageable);
 
+    @Query(value = "SELECT post " +
+            "FROM Post post  " +
+            "WHERE post.isActive = true" +
+            "   AND post.moderationStatus = :moderationStatus" +
+            "   AND post.moderator.email = :email ")
+    Page<Post> findAllByPostByModeratorEmail(@Param("email") String email, @Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
+
+    @Query(value = "SELECT post " +
+            "FROM Post post " +
+            "WHERE post.isActive = true" +
+            "   AND post.moderationStatus = :moderationStatus")
+    Page<Post> findAllByPostByModerationStatus(@Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
 }

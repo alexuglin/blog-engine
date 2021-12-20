@@ -131,7 +131,7 @@ public class AuthService {
         com.skillbox.diplom.model.User currentUser = userRepository
                 .findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
         int moderationCount = currentUser.isModerator() ?
-                postRepository.countPostByModerationStatus(ModerationStatus.NEW) : 0;
+                postRepository.countPostByModerationStatusAndIsActive(ModerationStatus.NEW, true) : 0;
         UserDTO userDTO = userMapper.convertTo(currentUser, moderationCount);
         return responseMapper.convertTo(userDTO, true);
     }
