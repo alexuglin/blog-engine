@@ -28,7 +28,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "is_moderator", nullable = false)
     private boolean isModerator;
@@ -42,6 +42,7 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @ToString.Exclude
     @Column(name = "password", nullable = false)
     private String password;
 

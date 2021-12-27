@@ -17,7 +17,6 @@ import com.skillbox.diplom.repository.CaptchaCodeRepository;
 import com.skillbox.diplom.repository.PostRepository;
 import com.skillbox.diplom.repository.UserRepository;
 import com.skillbox.diplom.util.GrayCase;
-import com.skillbox.diplom.util.enums.FieldName;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.mapstruct.factory.Mappers;
@@ -112,17 +111,17 @@ public class AuthService {
         Map<String, String> errors = new HashMap<>();
         Optional<com.skillbox.diplom.model.User> optionalUser = userRepository.findByEmail(userRequest.getEmail());
         if (optionalUser.isPresent()) {
-            errors.put(FieldName.EMAIL.getDescription(), Errors.EMAIL.getMessage());
+            errors.put(Errors.EMAIL.getFieldName(), Errors.EMAIL.getMessage());
         }
         CaptchaCode captchaCode = captchaCodeRepository.findBySecretCode(userRequest.getCaptchaSecret());
         if (!userRequest.getCaptcha().equals(captchaCode.getCode())) {
-            errors.put(FieldName.CAPTCHA.getDescription(), Errors.CAPTCHA.getMessage());
+            errors.put(Errors.CAPTCHA.getFieldName(), Errors.CAPTCHA.getMessage());
         }
         if (userRequest.getName().isBlank()) {
-            errors.put(FieldName.NAME.getDescription(), Errors.NAME.getMessage());
+            errors.put(Errors.NAME.getFieldName(), Errors.NAME.getMessage());
         }
         if (userRequest.getPassword().trim().length() < 6) {
-            errors.put(FieldName.PASSWORD.getDescription(), Errors.PASSWORD.getMessage());
+            errors.put(Errors.PASSWORD.getFieldName(), Errors.PASSWORD.getMessage());
         }
         return errors;
     }

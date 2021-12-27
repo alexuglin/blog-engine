@@ -23,7 +23,7 @@ public class CaptchaCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "time", nullable = false)
     private LocalDateTime time;

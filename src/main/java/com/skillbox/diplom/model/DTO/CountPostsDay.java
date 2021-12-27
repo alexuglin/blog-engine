@@ -18,8 +18,7 @@ public class CountPostsDay {
     private Long count;
 
     public CountPostsDay(Date date, Long count) {
-        DateConverter dateConverter = new DateConverter();
-        this.localDate = dateConverter.dateToLocalDate(date);
+        this.localDate = DateConverter.dateToLocalDate(date);
         this.count = count;
     }
 

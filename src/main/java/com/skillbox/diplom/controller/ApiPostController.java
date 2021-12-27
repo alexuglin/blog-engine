@@ -1,11 +1,7 @@
 package com.skillbox.diplom.controller;
 
 import com.skillbox.diplom.model.DTO.PostDTO;
-import com.skillbox.diplom.model.api.request.PostRequest;
-import com.skillbox.diplom.model.api.request.PostsRequest;
-import com.skillbox.diplom.model.api.request.RequestByDate;
-import com.skillbox.diplom.model.api.request.SearchRequest;
-import com.skillbox.diplom.model.api.request.TagRequest;
+import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/post")
@@ -28,23 +30,45 @@ public class ApiPostController {
     }
 
     @GetMapping
-    public ResponseEntity<PostsResponse> getPosts(PostRequest postRequest) {
-        return postService.getPost(postRequest);
+    public ResponseEntity<PostsResponse> getPosts(@RequestParam int offset,
+                                                  @RequestParam int limit,
+                                                  @RequestParam(required = false) String mode) {
+        return postService.getPost(offset, limit, mode);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyAuthority('user:write')")
+    public ResponseEntity<ErrorResponse> addPost(@Valid @RequestBody PostDTO postDTO) {
+
+        return postService.addPost(postDTO);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('user:write')")
+    public ResponseEntity<ErrorResponse> editPost(@PathVariable Integer id, @Valid @RequestBody PostDTO postDTO) {
+
+        return postService.editPost(id, postDTO);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<PostsResponse> searchPosts(SearchRequest searchRequest) {
-        return postService.searchPosts(searchRequest);
+    public ResponseEntity<PostsResponse> searchPosts(@RequestParam int offset,
+                                                     @RequestParam int limit,
+                                                     @RequestParam(required = false) String query) {
+        return postService.searchPosts(offset, limit, query);
     }
 
     @GetMapping("/byDate")
-    public ResponseEntity<PostsResponse> getPostsByDate(RequestByDate requestByDate) {
-        return postService.getPostsByDate(requestByDate);
+    public ResponseEntity<PostsResponse> getPostsByDate(@RequestParam int offset,
+                                                        @RequestParam int limit,
+                                                        @RequestParam(required = false) String date) {
+        return postService.getPostsByDate(offset, limit, date);
     }
 
     @GetMapping("/byTag")
-    public ResponseEntity<PostsResponse> getPostsByTag(TagRequest tagRequest) {
-        return postService.getPostsByTag(tagRequest);
+    public ResponseEntity<PostsResponse> getPostsByTag(@RequestParam int offset,
+                                                       @RequestParam int limit,
+                                                       @RequestParam(required = false) String tag) {
+        return postService.getPostsByTag(offset, limit, tag);
     }
 
     @GetMapping("/{id}")
@@ -54,14 +78,17 @@ public class ApiPostController {
 
     @GetMapping("/my")
     @PreAuthorize("hasAnyAuthority('user:write')")
-    public ResponseEntity<PostsResponse> getMyPosts(PostsRequest postsRequest) {
-        return postService.getMyPosts(postsRequest);
+    public ResponseEntity<PostsResponse> getMyPosts(@RequestParam int offset,
+                                                    @RequestParam int limit,
+                                                    @RequestParam(required = false) String status) {
+        return postService.getMyPosts(offset, limit, status);
     }
 
     @GetMapping("/moderation")
     @PreAuthorize("hasAnyAuthority('user:moderate')")
-    public ResponseEntity<PostsResponse> getPostModeration(PostsRequest postsRequest) {
-        return postService.getPostModeration(postsRequest);
+    public ResponseEntity<PostsResponse> getPostModeration(@RequestParam int offset,
+                                                           @RequestParam int limit,
+                                                           @RequestParam(required = false) String status) {
+        return postService.getPostModeration(offset, limit, status);
     }
-
 }

@@ -21,6 +21,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
@@ -73,7 +74,6 @@ public class Post {
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<PostComment> postComments;
 
-    @ToString.Exclude
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "tag2post",

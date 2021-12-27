@@ -23,7 +23,7 @@ public interface UserMapper {
     @Mapping(target = "moderation", source = "user.moderator")
     @Mapping(target = "settings", source = "user.moderator")
     @Mapping(target = "moderationCount", ignore = true)
-            UserDTO userToUserDTO(User user);
+    UserDTO userToUserDTO(User user);
 
     @Mapping(target = "regTime", expression = "java(LocalDateTime.now())")
     @Mapping(target = "moderator", expression = "java(false)")

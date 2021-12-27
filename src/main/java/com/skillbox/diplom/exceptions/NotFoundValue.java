@@ -1,10 +1,10 @@
 package com.skillbox.diplom.exceptions;
 
-public class NotFoundModerationStatus extends RuntimeException {
+public class NotFoundValue extends RuntimeException {
 
     private final String message;
 
-    public NotFoundModerationStatus(String message) {
+    public NotFoundValue(String message) {
         this.message = message;
     }
 

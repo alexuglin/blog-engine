@@ -1,24 +1,43 @@
 package com.skillbox.diplom.exceptions.enums;
 
+import com.skillbox.diplom.exceptions.NotFoundValue;
+
+import java.util.Arrays;
+
 public enum Errors {
 
-    EMAIL("Этот e-mail уже зарегистрирован"),
-    NAME("Имя указано неверно"),
-    PASSWORD("Пароль короче 6-ти символов"),
-    CAPTCHA("Код с картинки введён неверно"),
-    TITLE("Заголовок не установлен"),
-    POST("Текст публикации слишком короткий"),
-    IMAGE("Размер файла превышает допустимый размер"),
-    COMMENT("Текст комментария не задан или слишком короткий"),
-    DOCUMENT_NOT_FOUND("Документ не найден");
+    EMAIL("email", "Этот e-mail уже зарегистрирован"),
+    NAME("name", "Имя указано неверно"),
+    PASSWORD("password", "Пароль короче 6-ти символов"),
+    CAPTCHA("captcha", "Код с картинки введён неверно"),
+    TITLE("title", "Заголовок не установлен или слишком короткий"),
+    TEXT("text", "Текст публикации слишком короткий"),
+    IMAGE("image", "Размер файла превышает допустимый размер"),
+    COMMENT("comment", "Текст комментария не задан или слишком короткий"),
+    DOCUMENT_NOT_FOUND("document", "Документ не найден");
 
+
+    private final String fieldName;
     private final String message;
 
-    Errors(String message) {
+    Errors(String fieldName, String message) {
+        this.fieldName = fieldName;
         this.message = message;
+    }
+
+    public String getFieldName() {
+        return fieldName;
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public static Errors findErrorsByFieldName(String fieldName) {
+        return Arrays
+                .stream(values())
+                .filter(v -> v.getFieldName().equals(fieldName))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundValue("Not found fieldName " + fieldName));
     }
 }

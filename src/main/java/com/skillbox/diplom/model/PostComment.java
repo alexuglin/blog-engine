@@ -29,7 +29,7 @@ public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
@@ -41,7 +41,6 @@ public class PostComment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH,
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "user_id", nullable = false)

@@ -2,6 +2,8 @@ package com.skillbox.diplom.model.mappers;
 
 import com.skillbox.diplom.model.DTO.PostDTO;
 import com.skillbox.diplom.model.Post;
+import com.skillbox.diplom.model.User;
+import com.skillbox.diplom.model.enums.ModerationStatus;
 import com.skillbox.diplom.model.mappers.calculate.CounterVotes;
 import com.skillbox.diplom.model.mappers.convert.DateConverter;
 import com.skillbox.diplom.model.mappers.convert.TextConverter;
@@ -14,7 +16,8 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 @Mapper(uses = {DateConverter.class, UserMapper.class, TextConverter.class, CounterVotes.class,
-        CommentMapper.class, TagMapper.class})
+        CommentMapper.class, TagMapper.class},
+        imports = ModerationStatus.class)
 public interface PostMapper {
 
     @Named(value = "convertAnnounceTo")
@@ -28,12 +31,23 @@ public interface PostMapper {
     @Mapping(target = "tagList", ignore = true)
     PostDTO convertAnnounceTo(Post post);
 
+    @Mapping(target = "isActive", source = "post.active")
     @Mapping(target = "announce", ignore = true)
     @Mapping(target = "timestamp", source = "post.time", qualifiedByName = "dateToLong")
     @Mapping(target = "commentCount", ignore = true)
     @Mapping(target = "likeCount", source = "post.postVoteList", qualifiedByName = "calculateCountLikes")
     @Mapping(target = "dislikeCount", source = "post.postVoteList", qualifiedByName = "calculateCountDislikes")
     PostDTO convertTo(Post post);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "active", source = "postDTO.isActive")
+    @Mapping(target = "time", source = "postDTO.timestamp", qualifiedByName = "pastDateToCurrentDate")
+    @Mapping(target = "moderationStatus", expression = "java(ModerationStatus.NEW)")
+    @Mapping(target = "user", source = "currentUser")
+    @Mapping(target = "viewCount", expression = "java(0)")
+    @Mapping(target = "tagList", ignore = true)
+    @Mapping(target = "moderator", ignore = true)
+    Post postDTOToPost(PostDTO postDTO, User currentUser);
 
     @IterableMapping(qualifiedByName = "convertAnnounceTo")
     List<PostDTO> pagePostToListPostDTO(Page<Post> postPage);

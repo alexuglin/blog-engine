@@ -2,8 +2,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/blog_engine?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8
-    username: blog_engine
-    password: blog_engine
+    username: ${USER_NAME}
+    password: ${PASSWORD}
   jpa:
     show-sql: false
     hibernate:
@@ -13,3 +13,5 @@ spring:
 scheduling:
    # seconds of values
    deletingCodeCaptcha: 3600
+nameFolder:
+   upload: upload
