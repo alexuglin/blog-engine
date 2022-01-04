@@ -11,7 +11,6 @@ import com.skillbox.diplom.model.enums.ModerationStatus;
 import com.skillbox.diplom.model.mappers.PostMapper;
 import com.skillbox.diplom.model.mappers.convert.DateConverter;
 import com.skillbox.diplom.repository.PostRepository;
-import com.skillbox.diplom.repository.UserRepository;
 import com.skillbox.diplom.util.Paging;
 import com.skillbox.diplom.util.UserUtility;
 import com.skillbox.diplom.util.enums.FieldName;
@@ -36,7 +35,7 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserUtility userUtility;
     private final TagService tagService;
     private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
     private final Logger logger = Logger.getLogger(PostService.class);
@@ -91,17 +90,19 @@ public class PostService {
         logger.info("getPostById: came id - " + id);
         Optional<Post> optionalPost = postRepository.findById(id);
         Post post = optionalPost.orElse(new Post());
-        String email = UserUtility.getCurrentUserEmail();
+        User authorPost = post.getUser();
+        User currentUser = userUtility.getCurrentUser();
         boolean visibility = post.isActive();
-        if (!Objects.isNull(email)) {
-            User user = post.getUser();
-            visibility = user.getEmail().equals(email) || user.isModerator() || visibility;
+        if (!Objects.isNull(currentUser)) {
+            visibility = authorPost.equals(currentUser) || currentUser.isModerator() || visibility;
         }
         if (!visibility && post.getModerationStatus() != ModerationStatus.ACCEPTED
                 && post.getTime().compareTo(LocalDateTime.now()) > 0) {
             throw new NotFoundPostException(Errors.DOCUMENT_NOT_FOUND.getMessage());
         }
-        post.setViewCount(post.getViewCount() + 1);
+        if (Objects.isNull(currentUser) || (!authorPost.equals(currentUser) && !currentUser.isModerator())) {
+            post.setViewCount(post.getViewCount() + 1);
+        }
         postRepository.save(post);
         return ResponseEntity.ok(postMapper.convertTo(post));
     }
@@ -134,9 +135,9 @@ public class PostService {
     @Transactional
     public ResponseEntity<ErrorResponse> addPost(PostDTO postDTO) {
         logger.info("addPost: " + postDTO);
-        User user = userRepository.findByEmail(UserUtility.getCurrentUserEmail()).orElse(new User());
+        User user = userUtility.getCurrentUser();
         Post post = postMapper.postDTOToPost(postDTO, user);
-        tagService.addTagsToPost(postDTO.getTagList(),post);
+        tagService.addTagsToPost(postDTO.getTagList(), post);
         postRepository.save(post);
         return ResponseEntity.ok(new ErrorResponse());
     }
@@ -148,7 +149,7 @@ public class PostService {
         currentPost.setActive(postDTO.getIsActive());
         currentPost.setTitle(postDTO.getTitle());
         currentPost.setText(postDTO.getText());
-        User user = userRepository.findByEmail(UserUtility.getCurrentUserEmail()).orElse(new User());
+        User user = userUtility.getCurrentUser();
         if (!user.isModerator()) {
             currentPost.setModerationStatus(ModerationStatus.NEW);
         }

@@ -8,8 +8,8 @@ import java.util.List;
 public enum ModerationStatus {
 
     NEW(List.of("pending", "new")),
-    ACCEPTED(List.of("published", "accepted")),
-    DECLINED(List.of("declined"));
+    ACCEPTED(List.of("published", "accepted", "accept")),
+    DECLINED(List.of("declined", "decline"));
 
     private final List<String> descriptions;
 

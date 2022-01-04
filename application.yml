@@ -10,8 +10,10 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+    clean-disabled: false
+file:
+  max-file-size: 500KB
+  extensions: png, jpg, jpeg
 scheduling:
    # seconds of values
-   deletingCodeCaptcha: 3600
-nameFolder:
-   upload: upload
+   delete-code-captcha: 3600

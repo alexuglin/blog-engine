@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -40,7 +39,7 @@ public class DateConverter {
     public LocalDateTime pastDateToCurrentDate(Long timestamp) {
         LocalDateTime checkDate = longToDateTime(timestamp);
         LocalDateTime currentDate = LocalDateTime.now();
-        return  checkDate.compareTo(currentDate) < 0 ? currentDate : checkDate;
+        return checkDate.compareTo(currentDate) < 0 ? currentDate : checkDate;
     }
 
 }

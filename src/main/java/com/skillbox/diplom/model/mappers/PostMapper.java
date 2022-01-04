@@ -16,7 +16,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 @Mapper(uses = {DateConverter.class, UserMapper.class, TextConverter.class, CounterVotes.class,
-        CommentMapper.class, TagMapper.class},
+        PostCommentMapper.class, TagMapper.class},
         imports = ModerationStatus.class)
 public interface PostMapper {
 

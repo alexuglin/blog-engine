@@ -1,16 +1,15 @@
 package com.skillbox.diplom.model.api.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserRequest {
 
     @JsonProperty("e_mail")
@@ -25,4 +24,8 @@ public class UserRequest {
 
     @JsonProperty("captcha_secret")
     private String captchaSecret;
+
+    private MultipartFile photo;
+
+    private boolean removePhoto;
 }

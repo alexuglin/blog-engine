@@ -85,7 +85,8 @@ public class TagService {
                     tag.setName(nameTag.toLowerCase());
                     return tag;
                 }).filter(tag -> !foundTags.contains(tag))
-                .collect(Collectors.toList());;
+                .collect(Collectors.toList());
+        ;
         newTags.addAll(foundTags);
         return newTags;
     }

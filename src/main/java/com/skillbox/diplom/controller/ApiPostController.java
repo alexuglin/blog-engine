@@ -1,9 +1,11 @@
 package com.skillbox.diplom.controller;
 
 import com.skillbox.diplom.model.DTO.PostDTO;
+import com.skillbox.diplom.model.api.request.PostRequest;
 import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.service.PostService;
+import com.skillbox.diplom.service.PostVoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,10 +25,12 @@ import javax.validation.Valid;
 public class ApiPostController {
 
     private final PostService postService;
+    private final PostVoteService postVoteService;
 
     @Autowired
-    public ApiPostController(PostService postService) {
+    public ApiPostController(PostService postService, PostVoteService postVoteService) {
         this.postService = postService;
+        this.postVoteService = postVoteService;
     }
 
     @GetMapping
@@ -90,5 +94,17 @@ public class ApiPostController {
                                                            @RequestParam int limit,
                                                            @RequestParam(required = false) String status) {
         return postService.getPostModeration(offset, limit, status);
+    }
+
+    @PostMapping("/like")
+    @PreAuthorize("hasAnyAuthority('user:write')")
+    public ResponseEntity<ErrorResponse> setLike(@RequestBody PostRequest postRequest) {
+        return postVoteService.setLike(postRequest);
+    }
+
+    @PostMapping("/dislike")
+    @PreAuthorize("hasAnyAuthority('user:write')")
+    public ResponseEntity<ErrorResponse> setDislike(@RequestBody PostRequest postRequest) {
+        return postVoteService.setDislike(postRequest);
     }
 }

@@ -18,7 +18,7 @@ public class InitResponse {
     private String phone = "+7-900-539 95 79";
 
     @JsonProperty(value = "email")
-    private String email = "auglin@yandex.ru";
+    private String email = "lexuglin@mail.ru";
 
     @JsonProperty(value = "copyright")
     private String copyright = "Углин Александр";

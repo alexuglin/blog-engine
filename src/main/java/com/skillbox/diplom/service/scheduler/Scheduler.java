@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Scheduler {
 
-    @Value("${scheduling.deletingCodeCaptcha}")
+    @Value("${scheduling.delete-code-captcha}")
     private Integer deletingCodeCaptcha;
 
     private final TagRepository tagRepository;

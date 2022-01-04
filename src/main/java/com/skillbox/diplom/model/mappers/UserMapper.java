@@ -27,5 +27,6 @@ public interface UserMapper {
 
     @Mapping(target = "regTime", expression = "java(LocalDateTime.now())")
     @Mapping(target = "moderator", expression = "java(false)")
+    @Mapping(target = "photo", ignore = true)
     User userRequestToUser(UserRequest userRequest);
 }
