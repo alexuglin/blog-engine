@@ -22,12 +22,12 @@ public class PostDTO {
 
     private UserDTO user;
 
-    @Size(min = 3)
+    @Size(min = 3, message = "Заголовок не установлен или слишком короткий")
     private String title;
 
     private String announce;
 
-    @Size(min = 50)
+    @Size(min = 50, message = "Текст публикации не задан или слишком короткий")
     private String text;
 
     private Integer likeCount;

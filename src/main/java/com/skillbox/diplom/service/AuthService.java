@@ -1,8 +1,6 @@
 package com.skillbox.diplom.service;
 
 import com.skillbox.diplom.config.AppSecurityConfig;
-import com.skillbox.diplom.exceptions.WrongDataException;
-import com.skillbox.diplom.exceptions.enums.Errors;
 import com.skillbox.diplom.model.CaptchaCode;
 import com.skillbox.diplom.model.DTO.CaptchaDTO;
 import com.skillbox.diplom.model.DTO.UserDTO;
@@ -16,7 +14,9 @@ import com.skillbox.diplom.model.mappers.UserMapper;
 import com.skillbox.diplom.repository.CaptchaCodeRepository;
 import com.skillbox.diplom.repository.PostRepository;
 import com.skillbox.diplom.repository.UserRepository;
+import com.skillbox.diplom.util.GenerateHash;
 import com.skillbox.diplom.util.GrayCase;
+import com.skillbox.diplom.util.UtilResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.mapstruct.factory.Mappers;
@@ -31,11 +31,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,7 +55,7 @@ public class AuthService {
 
 
     public ResponseEntity<AuthResponse> login(UserRequest userRequest) {
-        logger.info(userRequest);
+        logger.info("login: " + userRequest);
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword()));
         User user = (User) authentication.getPrincipal();
@@ -92,38 +91,12 @@ public class AuthService {
 
     @Transactional
     public ResponseEntity<ErrorResponse> registerUser(UserRequest userRequest) {
-        logger.info(userRequest);
-        Map<String, String> errors = validationUserRequest(userRequest);
-        ErrorResponse errorResponse = new ErrorResponse();
-        if (!errors.isEmpty()) {
-            errorResponse.setErrors(errors);
-            errorResponse.setResult(false);
-            throw new WrongDataException(errorResponse);
-        }
+        logger.info("registerUser: " + userRequest);
         AppSecurityConfig appSecurityConfig = applicationContext.getBean(AppSecurityConfig.class);
         userRequest.setPassword(appSecurityConfig.passwordEncoder().encode(userRequest.getPassword()));
         com.skillbox.diplom.model.User user = userMapper.userRequestToUser(userRequest);
         userRepository.save(user);
-        return ResponseEntity.ok(errorResponse);
-    }
-
-    private Map<String, String> validationUserRequest(UserRequest userRequest) {
-        Map<String, String> errors = new HashMap<>();
-        Optional<com.skillbox.diplom.model.User> optionalUser = userRepository.findByEmail(userRequest.getEmail());
-        if (optionalUser.isPresent()) {
-            errors.put(Errors.EMAIL.getFieldName(), Errors.EMAIL.getMessage());
-        }
-        CaptchaCode captchaCode = captchaCodeRepository.findBySecretCode(userRequest.getCaptchaSecret());
-        if (!userRequest.getCaptcha().equals(captchaCode.getCode())) {
-            errors.put(Errors.CAPTCHA.getFieldName(), Errors.CAPTCHA.getMessage());
-        }
-        if (userRequest.getName().isBlank()) {
-            errors.put(Errors.NAME.getFieldName(), Errors.NAME.getMessage());
-        }
-        if (userRequest.getPassword().trim().length() < 6) {
-            errors.put(Errors.PASSWORD.getFieldName(), Errors.PASSWORD.getMessage());
-        }
-        return errors;
+        return ResponseEntity.ok(new ErrorResponse());
     }
 
     private AuthResponse getAuthResponse(String email) {
@@ -133,5 +106,24 @@ public class AuthService {
                 postRepository.countPostByModerationStatusAndIsActive(ModerationStatus.NEW, true) : 0;
         UserDTO userDTO = userMapper.convertTo(currentUser, moderationCount);
         return responseMapper.convertTo(userDTO, true);
+    }
+
+    @Transactional
+    public ResponseEntity<ErrorResponse> restorePassword(UserRequest userRequest, HttpServletRequest httpServletRequest) {
+        String email = userRequest.getEmail();
+        logger.info("restorePassword request email: " + email);
+        Optional<com.skillbox.diplom.model.User> optionalUser = Objects.nonNull(email) && !email.isBlank() ?
+                userRepository.findByEmail(email) : Optional.empty();
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.ok(UtilResponse.getErrorResponse());
+        }
+        com.skillbox.diplom.model.User user = optionalUser.get();
+        String hash = GenerateHash.getHash();
+        String link = httpServletRequest.getRequestURL().toString().replace(httpServletRequest.getRequestURI(),
+                "/login/change-password/" + hash);
+        user.setCode(hash);
+        userRepository.save(user);
+        logger.info("sent to " + link);
+        return ResponseEntity.ok(new ErrorResponse());
     }
 }

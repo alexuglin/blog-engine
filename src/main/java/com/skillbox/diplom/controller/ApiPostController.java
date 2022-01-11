@@ -6,7 +6,7 @@ import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.service.PostService;
 import com.skillbox.diplom.service.PostVoteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +22,11 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/post")
+@RequiredArgsConstructor
 public class ApiPostController {
 
     private final PostService postService;
     private final PostVoteService postVoteService;
-
-    @Autowired
-    public ApiPostController(PostService postService, PostVoteService postVoteService) {
-        this.postService = postService;
-        this.postVoteService = postVoteService;
-    }
 
     @GetMapping
     public ResponseEntity<PostsResponse> getPosts(@RequestParam int offset,

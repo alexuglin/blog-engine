@@ -4,6 +4,7 @@ public enum FieldName {
 
     TIME("time"),
     TAGS("tags"),
+    CAPTCHA("captcha"),
     ID("id");
 
     private final String description;

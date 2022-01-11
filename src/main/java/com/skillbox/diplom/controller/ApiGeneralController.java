@@ -8,15 +8,19 @@ import com.skillbox.diplom.model.api.response.CalendarResponse;
 import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.api.response.InitResponse;
 import com.skillbox.diplom.model.enums.NameSetting;
+import com.skillbox.diplom.model.validation.OnEditProfile;
+import com.skillbox.diplom.model.validation.annotation.ConstraintImage;
 import com.skillbox.diplom.service.InfoService;
 import com.skillbox.diplom.service.ModerationService;
 import com.skillbox.diplom.service.PostCommentService;
 import com.skillbox.diplom.service.ProfileService;
 import com.skillbox.diplom.service.StorageService;
 import com.skillbox.diplom.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,31 +36,19 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+@Validated
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ApiGeneralController {
 
     private final InfoService infoService;
     private final TagService tagService;
-    private final StorageService imageService;
+    private final StorageService storageService;
     private final PostCommentService postCommentService;
     private final ModerationService moderationService;
     private final ProfileService profileService;
 
-    @Autowired
-    public ApiGeneralController(InfoService infoService,
-                                TagService tagService,
-                                StorageService imageService,
-                                PostCommentService postCommentService,
-                                ModerationService moderationService,
-                                ProfileService profileService) {
-        this.infoService = infoService;
-        this.tagService = tagService;
-        this.imageService = imageService;
-        this.postCommentService = postCommentService;
-        this.moderationService = moderationService;
-        this.profileService = profileService;
-    }
 
     @GetMapping("/init")
     public ResponseEntity<InitResponse> init() {
@@ -81,8 +73,8 @@ public class ApiGeneralController {
     @PreAuthorize("hasAnyAuthority('user:write')")
     @PostMapping("/image")
     @ResponseBody
-    public String loadImage(@RequestParam("image") MultipartFile image) throws IOException {
-        return imageService.loadImage(image);
+    public String loadImage(@ConstraintImage @RequestParam("image") MultipartFile image) throws IOException {
+        return storageService.loadImage(image);
     }
 
     @PreAuthorize("hasAnyAuthority('user:write')")
@@ -98,8 +90,16 @@ public class ApiGeneralController {
     }
 
     @PreAuthorize("hasAnyAuthority('user:write')")
-    @PostMapping(value = "/profile/my")
-    public ResponseEntity<ErrorResponse> editProfile(UserRequest userRequest) {
+    @PostMapping(value = "/profile/my", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Validated(OnEditProfile.class)
+    public ResponseEntity<ErrorResponse> editProfileWithoutPhoto(@Valid @RequestBody UserRequest userRequest) throws IOException {
+        return profileService.editProfile(userRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('user:write')")
+    @PostMapping(value = "/profile/my", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Validated(OnEditProfile.class)
+    public ResponseEntity<ErrorResponse> editProfileWithPhoto(@Valid UserRequest userRequest) throws IOException {
         return profileService.editProfile(userRequest);
     }
 }

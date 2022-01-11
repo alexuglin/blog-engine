@@ -6,7 +6,6 @@ import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -19,8 +18,7 @@ public class CommentDTO {
 
     private Long timestamp;
 
-    @Size(min = 3)
-    @NotBlank
+    @Size(min = 3, message = "Текст комментария не задан или слишком короткий")
     private String text;
 
     private UserDTO user;
