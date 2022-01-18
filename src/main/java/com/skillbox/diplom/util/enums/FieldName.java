@@ -2,6 +2,7 @@ package com.skillbox.diplom.util.enums;
 
 public enum FieldName {
 
+    MESSAGE("message"),
     TIME("time"),
     TAGS("tags"),
     CAPTCHA("captcha"),

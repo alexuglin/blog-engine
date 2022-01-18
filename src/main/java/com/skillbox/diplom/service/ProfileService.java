@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +50,6 @@ public class ProfileService {
         }
         if (!currentUser.getEmail().equals(userRequest.getEmail())) {
             currentUser.setEmail(userRequest.getEmail());
-            SecurityContextHolder.clearContext();
         }
         userRepository.save(currentUser);
         logger.info("editProfile: save info user");

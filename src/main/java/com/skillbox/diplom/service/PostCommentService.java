@@ -44,8 +44,8 @@ public class PostCommentService {
         Optional<PostComment> optionalParentComment = !isNullParentId ?
                 postCommentRepository.findById(commentDTO.getParentId()) : Optional.empty();
         if (optionalPost.isEmpty() || (!isNullParentId && optionalParentComment.isEmpty())) {
-            ErrorResponse errorResponse = UtilResponse.getErrorResponse();
-            errorResponse.setErrors(Map.of(Errors.DOCUMENT_NOT_FOUND.getFieldName(), Errors.DOCUMENT_NOT_FOUND.getMessage()));
+            ErrorResponse errorResponse = UtilResponse
+                    .getErrorResponse(Map.of(FieldName.MESSAGE.getDescription(), Errors.DOCUMENT_NOT_FOUND.getMessage()));
             throw new WrongDataException(errorResponse);
         }
         User currentUser = userUtility.getCurrentUser();

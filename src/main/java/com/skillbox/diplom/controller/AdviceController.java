@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.mail.MessagingException;
 import javax.validation.ConstraintViolationException;
 import java.net.BindException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class AdviceController {
 
     private final Logger logger = Logger.getLogger(AdviceController.class);
     private final FileStorageProperties fileStorageProperties;
-
+    private static final String NAME_ANNOTATION_CAPTCHA = "ConstraintCaptcha";
 
     @ExceptionHandler({NotFoundPostException.class, NotFoundValue.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -46,7 +46,9 @@ public class AdviceController {
     @ExceptionHandler(WrongDataException.class)
     public ResponseEntity<ErrorResponse> handleWrongDateRequestException(WrongDataException exception) {
         logger.warn(exception);
-        return ResponseEntity.badRequest().body(exception.getErrorResponse());
+        ErrorResponse errorResponse = exception.getErrorResponse();
+        return Objects.nonNull(errorResponse.getErrors()) ? ResponseEntity.badRequest().body(errorResponse) :
+                ResponseEntity.ok(errorResponse);
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -58,13 +60,15 @@ public class AdviceController {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> onConstraintValidationException(ConstraintViolationException exception) {
+        logger.warn(exception);
         ErrorResponse errorResponse = UtilResponse.getErrorResponse();
         Map<String, String> errors = exception
                 .getConstraintViolations()
                 .stream().collect(Collectors
                         .toMap(v -> {
                             String path = v.getPropertyPath().toString();
-                            return path.substring(path.lastIndexOf(".") + 1);
+                            return v.getConstraintDescriptor().getAnnotation().toString().contains(NAME_ANNOTATION_CAPTCHA) ?
+                                    FieldName.CAPTCHA.getDescription() : path.substring(path.lastIndexOf(".") + 1);
                         }, v -> String.format(v.getMessage(), fileStorageProperties.getMaxSize(),
                                 fileStorageProperties.getExtensions())));
         errorResponse.setErrors(errors);
@@ -76,21 +80,23 @@ public class AdviceController {
         logger.warn(exception);
         Object target = exception.getBindingResult().getTarget();
         ErrorResponse errorResponse = UtilResponse.getErrorResponse();
-        Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult()
-                .getAllErrors()
-                .forEach(objectError -> {
-                    String codes = objectError.getCode();
-                    String nameField = objectError instanceof FieldError ?
-                            ((FieldError) objectError).getField() :
-                            !Objects.isNull(codes) && codes.contains("ConstraintCaptcha") ?
-                                    FieldName.CAPTCHA.getDescription() :
-                                    "Wrong data";
-                    errors.put(nameField, objectError.getDefaultMessage());
-                });
+        Map<String, String> errors = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(FieldError::getField,
+                        fieldError -> {
+                            String message = fieldError.getDefaultMessage();
+                            return Objects.isNull(message) ? "Wrong data" : message;
+                        }));
         errorResponse.setErrors(errors);
         return target instanceof PostDTO ?
                 ResponseEntity.ok(errorResponse) :
                 ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<ErrorResponse> handleMessagingException(MessagingException exception) {
+        logger.warn(exception);
+        return ResponseEntity.ok(UtilResponse.getErrorResponse(Map.of(FieldName.MESSAGE.getDescription(), exception.getMessage())));
     }
 }

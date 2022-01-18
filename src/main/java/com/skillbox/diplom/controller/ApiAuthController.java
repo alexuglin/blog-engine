@@ -5,6 +5,7 @@ import com.skillbox.diplom.model.api.request.UserRequest;
 import com.skillbox.diplom.model.api.response.AuthResponse;
 import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.validation.OnRegister;
+import com.skillbox.diplom.model.validation.OnRestorePassword;
 import com.skillbox.diplom.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
@@ -54,7 +56,13 @@ public class ApiAuthController {
     }
 
     @PostMapping("/restore")
-    public ResponseEntity<ErrorResponse> restorePassword(@RequestBody UserRequest userRequest, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<ErrorResponse> restorePassword(@RequestBody UserRequest userRequest, HttpServletRequest httpServletRequest) throws MessagingException {
         return authService.restorePassword(userRequest, httpServletRequest);
+    }
+
+    @PostMapping("/password")
+    @Validated(OnRestorePassword.class)
+    public ResponseEntity<ErrorResponse> changePassword(@Valid @RequestBody UserRequest userRequest) {
+        return authService.changePassword(userRequest);
     }
 }

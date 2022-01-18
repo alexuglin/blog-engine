@@ -11,6 +11,17 @@ spring:
   flyway:
     enabled: true
     clean-disabled: false
+  mail:
+    host: smtp.mail.ru
+    port: 25
+    username: ${MAIL_USER}
+    password: ${MAIL_PASS}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 file:
   max-file-size: 500KB
   extensions: png, jpg, jpeg
