@@ -3,11 +3,11 @@ package com.skillbox.diplom.exceptions;
 import lombok.ToString;
 
 @ToString
-public class NotFoundPostException extends RuntimeException {
+public class NotFoundDocumentException extends RuntimeException {
 
     private final String message;
 
-    public NotFoundPostException(String message) {
+    public NotFoundDocumentException(String message) {
         this.message = message;
     }
 

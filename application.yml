@@ -23,8 +23,8 @@ spring:
           starttls:
             enable: true
 file:
-  max-file-size: 500KB
-  extensions: png, jpg, jpeg
+  max-file-size: 1MB
+  extensions: png,jpg,jpeg
 scheduling:
    # seconds of values
    delete-code-captcha: 3600

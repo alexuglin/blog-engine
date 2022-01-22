@@ -1,6 +1,6 @@
 package com.skillbox.diplom.controller;
 
-import com.skillbox.diplom.exceptions.NotFoundPostException;
+import com.skillbox.diplom.exceptions.NotFoundDocumentException;
 import com.skillbox.diplom.exceptions.NotFoundValue;
 import com.skillbox.diplom.exceptions.WrongDataException;
 import com.skillbox.diplom.model.DTO.PostDTO;
@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,16 +36,16 @@ public class AdviceController {
     private final FileStorageProperties fileStorageProperties;
     private static final String NAME_ANNOTATION_CAPTCHA = "ConstraintCaptcha";
 
-    @ExceptionHandler({NotFoundPostException.class, NotFoundValue.class})
+    @ExceptionHandler({NotFoundDocumentException.class, NotFoundValue.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public String handleRegisterRequestException(NotFoundPostException exception) {
+    public String handleNotFoundDocumentException(NotFoundDocumentException exception) {
         logger.warn(exception);
         return exception.getMessage();
     }
 
     @ExceptionHandler(WrongDataException.class)
-    public ResponseEntity<ErrorResponse> handleWrongDateRequestException(WrongDataException exception) {
+    public ResponseEntity<ErrorResponse> handleWrongDateException(WrongDataException exception) {
         logger.warn(exception);
         ErrorResponse errorResponse = exception.getErrorResponse();
         return Objects.nonNull(errorResponse.getErrors()) ? ResponseEntity.badRequest().body(errorResponse) :
@@ -98,5 +99,12 @@ public class AdviceController {
     public ResponseEntity<ErrorResponse> handleMessagingException(MessagingException exception) {
         logger.warn(exception);
         return ResponseEntity.ok(UtilResponse.getErrorResponse(Map.of(FieldName.MESSAGE.getDescription(), exception.getMessage())));
+    }
+
+    @ExceptionHandler(AuthorizationServiceException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public String handleAuthorizationServiceException(AuthorizationServiceException exception) {
+        return exception.getMessage();
     }
 }

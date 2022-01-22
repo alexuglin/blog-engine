@@ -1,6 +1,6 @@
 package com.skillbox.diplom.service;
 
-import com.skillbox.diplom.exceptions.NotFoundPostException;
+import com.skillbox.diplom.exceptions.NotFoundDocumentException;
 import com.skillbox.diplom.exceptions.enums.Errors;
 import com.skillbox.diplom.model.DTO.PostDTO;
 import com.skillbox.diplom.model.Post;
@@ -8,8 +8,11 @@ import com.skillbox.diplom.model.User;
 import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.model.enums.ModerationStatus;
+import com.skillbox.diplom.model.enums.NameSetting;
+import com.skillbox.diplom.model.enums.ValueSetting;
 import com.skillbox.diplom.model.mappers.PostMapper;
 import com.skillbox.diplom.model.mappers.convert.DateConverter;
+import com.skillbox.diplom.repository.GlobalSettingsRepository;
 import com.skillbox.diplom.repository.PostRepository;
 import com.skillbox.diplom.util.Paging;
 import com.skillbox.diplom.util.UserUtility;
@@ -35,6 +38,7 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
     private final UserUtility userUtility;
     private final TagService tagService;
     private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
@@ -98,7 +102,7 @@ public class PostService {
         }
         if (!visibility && post.getModerationStatus() != ModerationStatus.ACCEPTED
                 && post.getTime().compareTo(LocalDateTime.now()) > 0) {
-            throw new NotFoundPostException(Errors.DOCUMENT_NOT_FOUND.getMessage());
+            throw new NotFoundDocumentException(Errors.DOCUMENT_NOT_FOUND.getMessage());
         }
         if (Objects.isNull(currentUser) || (!authorPost.equals(currentUser) && !currentUser.isModerator())) {
             post.setViewCount(post.getViewCount() + 1);
@@ -136,7 +140,10 @@ public class PostService {
     public ResponseEntity<ErrorResponse> addPost(PostDTO postDTO) {
         logger.info("addPost: " + postDTO);
         User user = userUtility.getCurrentUser();
-        Post post = postMapper.postDTOToPost(postDTO, user);
+        ModerationStatus moderationStatus = globalSettingsRepository
+                .findGlobalSettingByCode(NameSetting.POST_PREMODERATION).getValue() == ValueSetting.YES ?
+                ModerationStatus.NEW : ModerationStatus.ACCEPTED;
+        Post post = postMapper.postDTOToPost(postDTO, user, moderationStatus);
         tagService.addTagsToPost(postDTO.getTagList(), post);
         postRepository.save(post);
         return ResponseEntity.ok(new ErrorResponse());

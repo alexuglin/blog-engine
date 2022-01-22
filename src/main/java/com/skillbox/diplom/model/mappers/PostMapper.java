@@ -42,12 +42,12 @@ public interface PostMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "active", source = "postDTO.isActive")
     @Mapping(target = "time", source = "postDTO.timestamp", qualifiedByName = "pastDateToCurrentDate")
-    @Mapping(target = "moderationStatus", expression = "java(ModerationStatus.NEW)")
+    @Mapping(target = "moderationStatus", source = "moderationStatus")
     @Mapping(target = "user", source = "currentUser")
     @Mapping(target = "viewCount", expression = "java(0)")
     @Mapping(target = "tagList", ignore = true)
     @Mapping(target = "moderator", ignore = true)
-    Post postDTOToPost(PostDTO postDTO, User currentUser);
+    Post postDTOToPost(PostDTO postDTO, User currentUser, ModerationStatus moderationStatus);
 
     @IterableMapping(qualifiedByName = "convertAnnounceTo")
     List<PostDTO> pagePostToListPostDTO(Page<Post> postPage);

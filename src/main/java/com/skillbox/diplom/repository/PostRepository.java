@@ -1,6 +1,7 @@
 package com.skillbox.diplom.repository;
 
 import com.skillbox.diplom.model.DTO.CountPostsDay;
+import com.skillbox.diplom.model.DTO.StatisticsPost;
 import com.skillbox.diplom.model.Post;
 import com.skillbox.diplom.model.enums.ModerationStatus;
 import org.springframework.data.domain.Page;
@@ -102,4 +103,19 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "WHERE post.isActive = true" +
             "   AND post.moderationStatus = :moderationStatus")
     Page<Post> findAllByPostByModerationStatus(@Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
+
+    @Query("SELECT new com.skillbox.diplom.model.DTO.StatisticsPost(COUNT(post), SUM(post.viewCount), MIN(post.time)) " +
+            "from Post post " +
+            "WHERE post.user.id = :userId " +
+            "AND post.moderationStatus = 'ACCEPTED' " +
+            "AND post.isActive = true " +
+            "AND post.time <= CURRENT_TIMESTAMP")
+    StatisticsPost getStatisticsPostByUserId(@Param("userId") Integer userId);
+
+    @Query("SELECT new com.skillbox.diplom.model.DTO.StatisticsPost(COUNT(post), SUM(post.viewCount), MIN(post.time)) " +
+            "from Post post " +
+            "WHERE post.moderationStatus = 'ACCEPTED' " +
+            "AND post.isActive = true " +
+            "AND post.time <= CURRENT_TIMESTAMP")
+    StatisticsPost getStatisticsPost();
 }

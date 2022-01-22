@@ -1,5 +1,6 @@
 package com.skillbox.diplom.service;
 
+import com.skillbox.diplom.exceptions.NotFoundDocumentException;
 import com.skillbox.diplom.exceptions.WrongDataException;
 import com.skillbox.diplom.exceptions.enums.Errors;
 import com.skillbox.diplom.model.DTO.CommentDTO;
@@ -44,9 +45,7 @@ public class PostCommentService {
         Optional<PostComment> optionalParentComment = !isNullParentId ?
                 postCommentRepository.findById(commentDTO.getParentId()) : Optional.empty();
         if (optionalPost.isEmpty() || (!isNullParentId && optionalParentComment.isEmpty())) {
-            ErrorResponse errorResponse = UtilResponse
-                    .getErrorResponse(Map.of(FieldName.MESSAGE.getDescription(), Errors.DOCUMENT_NOT_FOUND.getMessage()));
-            throw new WrongDataException(errorResponse);
+            throw new NotFoundDocumentException(Errors.DOCUMENT_NOT_FOUND.getMessage());
         }
         User currentUser = userUtility.getCurrentUser();
         Post post = optionalPost.get();

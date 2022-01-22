@@ -1,19 +1,24 @@
 package com.skillbox.diplom.service;
 
 import com.skillbox.diplom.config.AppSecurityConfig;
+import com.skillbox.diplom.exceptions.NotFoundDocumentException;
 import com.skillbox.diplom.exceptions.WrongDataException;
 import com.skillbox.diplom.exceptions.enums.Errors;
 import com.skillbox.diplom.model.CaptchaCode;
 import com.skillbox.diplom.model.DTO.CaptchaDTO;
 import com.skillbox.diplom.model.DTO.UserDTO;
+import com.skillbox.diplom.model.GlobalSetting;
 import com.skillbox.diplom.model.api.request.UserRequest;
 import com.skillbox.diplom.model.api.response.AuthResponse;
 import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.enums.ModerationStatus;
+import com.skillbox.diplom.model.enums.NameSetting;
+import com.skillbox.diplom.model.enums.ValueSetting;
 import com.skillbox.diplom.model.mappers.CaptchaMapper;
 import com.skillbox.diplom.model.mappers.ResponseMapper;
 import com.skillbox.diplom.model.mappers.UserMapper;
 import com.skillbox.diplom.repository.CaptchaCodeRepository;
+import com.skillbox.diplom.repository.GlobalSettingsRepository;
 import com.skillbox.diplom.repository.PostRepository;
 import com.skillbox.diplom.repository.UserRepository;
 import com.skillbox.diplom.util.GenerateHash;
@@ -49,6 +54,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
     private final CaptchaMapper captchaMapper = Mappers.getMapper(CaptchaMapper.class);
     private final ResponseMapper responseMapper = Mappers.getMapper(ResponseMapper.class);
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
@@ -104,10 +110,15 @@ public class AuthService {
     @Transactional
     public ResponseEntity<ErrorResponse> registerUser(UserRequest userRequest) {
         logger.info("registerUser: " + userRequest);
+        GlobalSetting globalSetting = globalSettingsRepository.findGlobalSettingByCode(NameSetting.MULTIUSER_MODE);
+        if (globalSetting.getValue() == ValueSetting.NO) {
+            throw new NotFoundDocumentException("Регистрация запрещена!");
+        }
         AppSecurityConfig appSecurityConfig = applicationContext.getBean(AppSecurityConfig.class);
         userRequest.setPassword(appSecurityConfig.passwordEncoder().encode(userRequest.getPassword()));
         com.skillbox.diplom.model.User user = userMapper.userRequestToUser(userRequest);
         userRepository.save(user);
+        logger.info("registerUser: success!");
         return ResponseEntity.ok(new ErrorResponse());
     }
 
