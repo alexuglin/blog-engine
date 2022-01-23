@@ -1,5 +1,6 @@
 .idea/
 target/
+upload/
 # Compiled class file
 *.class
 *.iml

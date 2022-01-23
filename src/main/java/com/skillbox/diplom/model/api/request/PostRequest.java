@@ -1,15 +1,15 @@
 package com.skillbox.diplom.model.api.request;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString(callSuper = true)
+@Data
 @NoArgsConstructor
-public class PostRequest extends BaseRequest {
+public class PostRequest {
 
-    private String mode;
+    @JsonProperty(value = "post_id")
+    private Integer postId;
+
+    private String decision;
 }

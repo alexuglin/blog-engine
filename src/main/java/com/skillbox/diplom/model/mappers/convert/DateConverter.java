@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -18,15 +18,28 @@ public class DateConverter {
 
     @Named("dateToLong")
     public Long dateToLong(LocalDateTime dateTime) {
-        return dateTime.toEpochSecond(ZoneOffset.UTC);
+        return dateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
-    public LocalDate stringToLocalDate(String date) {
+    public static LocalDate stringToLocalDate(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(date, formatter);
     }
 
-    public LocalDate dateToLocalDate(Date date) {
+    public static LocalDate dateToLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
+
+    @Named("longToDateTime")
+    public LocalDateTime longToDateTime(Long timestamp) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    @Named("pastDateToCurrentDate")
+    public LocalDateTime pastDateToCurrentDate(Long timestamp) {
+        LocalDateTime checkDate = longToDateTime(timestamp);
+        LocalDateTime currentDate = LocalDateTime.now();
+        return checkDate.compareTo(currentDate) < 0 ? currentDate : checkDate;
+    }
+
 }

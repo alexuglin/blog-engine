@@ -3,6 +3,7 @@ package com.skillbox.diplom.model.DTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class UserDTO {
 
     private String email;
 
+    @ToString.Exclude
     private String password;
 
     private Boolean moderation;

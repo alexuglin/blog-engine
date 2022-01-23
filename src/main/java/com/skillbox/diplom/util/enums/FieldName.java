@@ -2,17 +2,11 @@ package com.skillbox.diplom.util.enums;
 
 public enum FieldName {
 
+    MESSAGE("message"),
     TIME("time"),
-    IS_ACTIVE("isActive"),
-    MODERATION_STATUS("moderationStatus"),
-    NAME("name"),
-    TAG("tag"),
-    POST("post"),
-    EMAIL("email"),
-    PASSWORD("password"),
+    TAGS("tags"),
     CAPTCHA("captcha"),
-    IMAGE("image"),
-    TAGS("tags");
+    ID("id");
 
     private final String description;
 

@@ -26,7 +26,7 @@ public class GlobalSetting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "code", nullable = false)
     @Enumerated(value = EnumType.STRING)

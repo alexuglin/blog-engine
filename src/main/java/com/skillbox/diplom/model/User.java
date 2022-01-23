@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -28,7 +29,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "is_moderator", nullable = false)
     private boolean isModerator;
@@ -42,6 +43,7 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @ToString.Exclude
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -59,5 +61,18 @@ public class User {
 
     public Role getRole() {
         return isModerator ? Role.MODERATOR : Role.USER;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

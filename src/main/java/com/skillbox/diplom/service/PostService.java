@@ -1,19 +1,18 @@
 package com.skillbox.diplom.service;
 
-import com.skillbox.diplom.exceptions.NotFoundPostException;
+import com.skillbox.diplom.exceptions.NotFoundDocumentException;
 import com.skillbox.diplom.exceptions.enums.Errors;
 import com.skillbox.diplom.model.DTO.PostDTO;
 import com.skillbox.diplom.model.Post;
 import com.skillbox.diplom.model.User;
-import com.skillbox.diplom.model.api.request.PostRequest;
-import com.skillbox.diplom.model.api.request.PostsRequest;
-import com.skillbox.diplom.model.api.request.RequestByDate;
-import com.skillbox.diplom.model.api.request.SearchRequest;
-import com.skillbox.diplom.model.api.request.TagRequest;
+import com.skillbox.diplom.model.api.response.ErrorResponse;
 import com.skillbox.diplom.model.api.response.PostsResponse;
 import com.skillbox.diplom.model.enums.ModerationStatus;
+import com.skillbox.diplom.model.enums.NameSetting;
+import com.skillbox.diplom.model.enums.ValueSetting;
 import com.skillbox.diplom.model.mappers.PostMapper;
 import com.skillbox.diplom.model.mappers.convert.DateConverter;
+import com.skillbox.diplom.repository.GlobalSettingsRepository;
 import com.skillbox.diplom.repository.PostRepository;
 import com.skillbox.diplom.util.Paging;
 import com.skillbox.diplom.util.UserUtility;
@@ -39,14 +38,18 @@ import java.util.Optional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
+    private final UserUtility userUtility;
+    private final TagService tagService;
     private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
     private final Logger logger = Logger.getLogger(PostService.class);
+    private static final String LOGGER_INFO = "%s: offset = %d limit = %d";
 
-    public ResponseEntity<PostsResponse> getPost(PostRequest postRequest) {
-        logger.info("getPost: came - " + postRequest);
+    public ResponseEntity<PostsResponse> getPost(int offset, int limit, String mode) {
+        logger.info(String.format(LOGGER_INFO, "getPost: mode = " + mode, offset, limit));
         Page<Post> postPage;
-        Pageable pageable = Paging.getPaging(postRequest.getOffset(), postRequest.getLimit(), Sort.unsorted());
-        switch (postRequest.getMode()) {
+        Pageable pageable = Paging.getPaging(offset, limit, Sort.unsorted());
+        switch (mode) {
             case "popular":
                 postPage = postRepository.findAllByPostsActiveOrderByCountComment(pageable);
                 break;
@@ -54,37 +57,35 @@ public class PostService {
                 postPage = postRepository.findAllByPostsActiveOrderByCountVote(pageable);
                 break;
             case "early":
-                pageable = Paging.getPaging(postRequest.getOffset(), postRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).ascending());
+                pageable = Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).ascending());
                 postPage = postRepository.findAllByPostsActive(pageable);
                 break;
             default:
-                pageable = Paging.getPaging(postRequest.getOffset(), postRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending());
+                pageable = Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).descending());
                 postPage = postRepository.findAllByPostsActive(pageable);
         }
         return ResponseEntity.ok(getPostsResponse(postPage));
     }
 
-    public ResponseEntity<PostsResponse> searchPosts(SearchRequest searchRequest) {
-        logger.info("searchPosts: came - " + searchRequest);
-        Pageable pageable = Paging.getPaging(searchRequest.getOffset(), searchRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending());
-        Page<Post> postPage = postRepository.findPosts(Objects.isNull(searchRequest.getQuery()) ||
-                searchRequest.getQuery().isBlank() ? "" : searchRequest.getQuery(), pageable);
+    public ResponseEntity<PostsResponse> searchPosts(int offset, int limit, String query) {
+        logger.info(String.format(LOGGER_INFO, "searchPosts: query = " + query, offset, limit));
+        Pageable pageable = Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).descending());
+        Page<Post> postPage = postRepository.findPosts(Objects.isNull(query) || query.isBlank() ? "" : query, pageable);
         return ResponseEntity.ok(getPostsResponse(postPage));
     }
 
-    public ResponseEntity<PostsResponse> getPostsByDate(RequestByDate requestByDate) {
-        logger.info("getPostsByDate: came - " + requestByDate);
-        DateConverter dateConverter = new DateConverter();
-        LocalDate localDate = dateConverter.stringToLocalDate(requestByDate.getDate());
+    public ResponseEntity<PostsResponse> getPostsByDate(int offset, int limit, String date) {
+        logger.info(String.format(LOGGER_INFO, "getPostsByDate: query = " + date, offset, limit));
+        LocalDate localDate = DateConverter.stringToLocalDate(date);
         Page<Post> postPage = postRepository
-                .findPostByDate(localDate, Paging.getPaging(requestByDate.getOffset(), requestByDate.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending()));
+                .findPostByDate(localDate, Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).descending()));
         return ResponseEntity.ok(getPostsResponse(postPage));
     }
 
-    public ResponseEntity<PostsResponse> getPostsByTag(TagRequest tagRequest) {
-        logger.info("getPostsByTag: came - " + tagRequest);
+    public ResponseEntity<PostsResponse> getPostsByTag(int offset, int limit, String tag) {
+        logger.info(String.format(LOGGER_INFO, "getPostsByTag: tag = " + tag, offset, limit));
         Page<Post> postPage = postRepository
-                .findPostByTag(tagRequest.getTag(), Paging.getPaging(tagRequest.getOffset(), tagRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending()));
+                .findPostByTag(tag, Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).descending()));
         return ResponseEntity.ok(getPostsResponse(postPage));
     }
 
@@ -93,44 +94,76 @@ public class PostService {
         logger.info("getPostById: came id - " + id);
         Optional<Post> optionalPost = postRepository.findById(id);
         Post post = optionalPost.orElse(new Post());
-        String email = UserUtility.getCurrentUserEmail();
+        User authorPost = post.getUser();
+        User currentUser = userUtility.getCurrentUser();
         boolean visibility = post.isActive();
-        if (!Objects.isNull(email)) {
-            User user = post.getUser();
-            visibility = user.getEmail().equals(email) || user.isModerator() || visibility;
+        if (!Objects.isNull(currentUser)) {
+            visibility = authorPost.equals(currentUser) || currentUser.isModerator() || visibility;
         }
-        if (!visibility || post.getModerationStatus() != ModerationStatus.ACCEPTED
-                || post.getTime().compareTo(LocalDateTime.now()) > 0) {
-            throw new NotFoundPostException(Errors.DOCUMENT_NOT_FOUND.getMessage());
+        if (!visibility && post.getModerationStatus() != ModerationStatus.ACCEPTED
+                && post.getTime().compareTo(LocalDateTime.now()) > 0) {
+            throw new NotFoundDocumentException(Errors.DOCUMENT_NOT_FOUND.getMessage());
         }
-        post.setViewCount(post.getViewCount() + 1);
+        if (Objects.isNull(currentUser) || (!authorPost.equals(currentUser) && !currentUser.isModerator())) {
+            post.setViewCount(post.getViewCount() + 1);
+        }
         postRepository.save(post);
         return ResponseEntity.ok(postMapper.convertTo(post));
     }
 
-    public ResponseEntity<PostsResponse> getMyPosts(PostsRequest postsRequest) {
-        logger.info(postsRequest);
+    public ResponseEntity<PostsResponse> getMyPosts(int offset, int limit, String status) {
+        logger.info(String.format(LOGGER_INFO, "getMyPosts status = " + status, offset, limit));
         String email = UserUtility.getCurrentUserEmail();
-        Page<Post> postPage;
-        Pageable pageable = Paging.getPaging(postsRequest.getOffset(), postsRequest.getLimit(), Sort.by(FieldName.TIME.getDescription()).descending());
-        switch (postsRequest.getStatus()) {
-            case "inactive":
-                postPage = postRepository.findAllByPostNotActiveByUserEmail(email, pageable);
-                break;
-            case "pending":
-                postPage = postRepository.findAllByPostByUserEmail(email, ModerationStatus.NEW, pageable);
-                break;
-            case "declined":
-                postPage = postRepository.findAllByPostByUserEmail(email, ModerationStatus.DECLINED, pageable);
-                break;
-            default:
-                postPage = postRepository.findAllByPostByUserEmail(email, ModerationStatus.ACCEPTED, pageable);
-        }
+        Pageable pageable = Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).descending());
+        Page<Post> postPage = status.equals("inactive") ? postRepository.findAllByPostNotActiveByUserEmail(email, pageable) :
+                postRepository.findAllByPostByUserEmail(email, ModerationStatus.findModerationStatusByStatus(status), pageable);
         return ResponseEntity.ok(getPostsResponse(postPage));
     }
 
-    private PostsResponse getPostsResponse( Page<Post> postPage) {
+    public ResponseEntity<PostsResponse> getPostModeration(int offset, int limit, String status) {
+        logger.info(String.format(LOGGER_INFO, "getPostModeration status = " + status, offset, limit));
+        String email = UserUtility.getCurrentUserEmail();
+        Pageable pageable = Paging.getPaging(offset, limit, Sort.by(FieldName.TIME.getDescription()).descending());
+        ModerationStatus moderationStatus = ModerationStatus.findModerationStatusByStatus(status);
+        Page<Post> postPage = moderationStatus == ModerationStatus.NEW ?
+                postRepository.findAllByPostByModerationStatus(moderationStatus, pageable) :
+                postRepository.findAllByPostByModeratorEmail(email, moderationStatus, pageable);
+        return ResponseEntity.ok(getPostsResponse(postPage));
+    }
+
+    private PostsResponse getPostsResponse(Page<Post> postPage) {
         List<PostDTO> postDTOList = postMapper.pagePostToListPostDTO(postPage);
         return new PostsResponse(postPage.getTotalElements(), postDTOList);
+    }
+
+    @Transactional
+    public ResponseEntity<ErrorResponse> addPost(PostDTO postDTO) {
+        logger.info("addPost: " + postDTO);
+        User user = userUtility.getCurrentUser();
+        ModerationStatus moderationStatus = globalSettingsRepository
+                .findGlobalSettingByCode(NameSetting.POST_PREMODERATION).getValue() == ValueSetting.YES ?
+                ModerationStatus.NEW : ModerationStatus.ACCEPTED;
+        Post post = postMapper.postDTOToPost(postDTO, user, moderationStatus);
+        tagService.addTagsToPost(postDTO.getTagList(), post);
+        postRepository.save(post);
+        return ResponseEntity.ok(new ErrorResponse());
+    }
+
+    @Transactional
+    public ResponseEntity<ErrorResponse> editPost(Integer id, PostDTO postDTO) {
+        logger.info("editPost: " + postDTO + ", id = " + id);
+        Post currentPost = postRepository.findById(id).orElse(new Post());
+        currentPost.setActive(postDTO.getIsActive());
+        currentPost.setTitle(postDTO.getTitle());
+        currentPost.setText(postDTO.getText());
+        User user = userUtility.getCurrentUser();
+        if (!user.isModerator()) {
+            currentPost.setModerationStatus(ModerationStatus.NEW);
+        }
+        DateConverter dateConverter = new DateConverter();
+        currentPost.setTime(dateConverter.pastDateToCurrentDate(postDTO.getTimestamp()));
+        tagService.editTagsFromPost(postDTO.getTagList(), currentPost);
+        postRepository.save(currentPost);
+        return ResponseEntity.ok(new ErrorResponse());
     }
 }

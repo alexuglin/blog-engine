@@ -1,6 +1,7 @@
 package com.skillbox.diplom.repository;
 
 import com.skillbox.diplom.model.DTO.CountPostsDay;
+import com.skillbox.diplom.model.DTO.StatisticsPost;
 import com.skillbox.diplom.model.Post;
 import com.skillbox.diplom.model.enums.ModerationStatus;
 import org.springframework.data.domain.Page;
@@ -75,21 +76,46 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "   AND tp.tag.name = :tag ")
     Page<Post> findPostByTag(@Param("tag") String tag, Pageable paging);
 
-    int countPostByModerationStatus(ModerationStatus moderationStatus);
+    int countPostByModerationStatusAndIsActive(ModerationStatus moderationStatus, boolean active);
 
     @Query(value = "SELECT post " +
-            "FROM Post post INNER JOIN User user " +
-            "ON post.user = user " +
+            "FROM Post post " +
             "WHERE post.isActive = true" +
             "   AND post.moderationStatus = :moderationStatus" +
-            "   AND user.email = :email ")
+            "   AND post.user.email = :email ")
     Page<Post> findAllByPostByUserEmail(@Param("email") String email, @Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
 
     @Query(value = "SELECT post " +
-            "FROM Post post INNER JOIN User user " +
-            "ON post.user = user " +
+            "FROM Post post " +
             "WHERE post.isActive = false" +
-            "   AND user.email = :email ")
+            "   AND post.user.email = :email ")
     Page<Post> findAllByPostNotActiveByUserEmail(@Param("email") String email, Pageable pageable);
 
+    @Query(value = "SELECT post " +
+            "FROM Post post  " +
+            "WHERE post.isActive = true" +
+            "   AND post.moderationStatus = :moderationStatus" +
+            "   AND post.moderator.email = :email ")
+    Page<Post> findAllByPostByModeratorEmail(@Param("email") String email, @Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
+
+    @Query(value = "SELECT post " +
+            "FROM Post post " +
+            "WHERE post.isActive = true" +
+            "   AND post.moderationStatus = :moderationStatus")
+    Page<Post> findAllByPostByModerationStatus(@Param("moderationStatus") ModerationStatus moderationStatus, Pageable pageable);
+
+    @Query("SELECT new com.skillbox.diplom.model.DTO.StatisticsPost(COUNT(post), SUM(post.viewCount), MIN(post.time)) " +
+            "from Post post " +
+            "WHERE post.user.id = :userId " +
+            "AND post.moderationStatus = 'ACCEPTED' " +
+            "AND post.isActive = true " +
+            "AND post.time <= CURRENT_TIMESTAMP")
+    StatisticsPost getStatisticsPostByUserId(@Param("userId") Integer userId);
+
+    @Query("SELECT new com.skillbox.diplom.model.DTO.StatisticsPost(COUNT(post), SUM(post.viewCount), MIN(post.time)) " +
+            "from Post post " +
+            "WHERE post.moderationStatus = 'ACCEPTED' " +
+            "AND post.isActive = true " +
+            "AND post.time <= CURRENT_TIMESTAMP")
+    StatisticsPost getStatisticsPost();
 }

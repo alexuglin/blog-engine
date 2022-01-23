@@ -2,23 +2,24 @@ package com.skillbox.diplom.exceptions.enums;
 
 public enum Errors {
 
-    EMAIL("Этот e-mail уже зарегистрирован"),
-    NAME("Имя указано неверно"),
-    PASSWORD("Пароль короче 6-ти символов"),
-    CAPTCHA("Код с картинки введён неверно"),
-    TITLE("Заголовок не установлен"),
-    POST("Текст публикации слишком короткий"),
-    IMAGE("Размер файла превышает допустимый размер"),
-    COMMENT("Текст комментария не задан или слишком короткий"),
-    DOCUMENT_NOT_FOUND("Документ не найден");
+    DOCUMENT_NOT_FOUND("document", "Документ не найден"),
+    CODE("code", "Ссылка для восстановления пароля устарела. " +
+            "<a href=\"/auth/restore-password\">Запросить ссылку снова</a>");
 
+    private final String fieldName;
     private final String message;
 
-    Errors(String message) {
+    Errors(String fieldName, String message) {
+        this.fieldName = fieldName;
         this.message = message;
+    }
+
+    public String getFieldName() {
+        return fieldName;
     }
 
     public String getMessage() {
         return message;
     }
+
 }
